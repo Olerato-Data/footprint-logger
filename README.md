@@ -2,7 +2,7 @@
 
 A web platform that helps users track daily activities contributing to carbon emissions, view personalised summaries, and receive actionable tips to reduce their environmental impact.
 
-Built as a Data Analytics Capstone project for a local environmental group.
+Built as a Develor Associate Capstone project for a local environmental group.
 
 ---
 
@@ -35,97 +35,28 @@ Built as a Data Analytics Capstone project for a local environmental group.
 
 ---
 
-## 🛠️ Tech Stack
+## How to Use
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | HTML5, CSS3, Vanilla JavaScript |
-| Charts | Chart.js 4.4 |
-| Data persistence | localStorage (frontend) / MongoDB (backend) |
-| Backend *(planned)* | Node.js, Express.js |
-| Database *(planned)* | MongoDB + Mongoose |
-| Auth *(planned)* | JWT, bcrypt |
+1. Open `index.html` in any web browser
+2. Select an activity category (Transport, Food, or Energy)
+3. Pick an activity and enter the amount
+4. Click "Log Activity"
+5. View your dashboard and insights
 
----
+## Tech Used
 
-## 📁 Project Structure
+- HTML, CSS, JavaScript
+- Chart.js for graphs
+- localStorage for saving data
 
-```
-footprint-logger/
-├── index.html          # Main application (single-file frontend)
-├── README.md           # Project documentation
-├── /backend            # Node.js + Express API (planned)
-│   ├── server.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   └── logs.js
-│   ├── models/
-│   │   ├── User.js
-│   │   └── ActivityLog.js
-│   └── middleware/
-│       └── auth.js
-└── /public             # Static assets
-```
+## Live Demo
 
----
+https://Olerato-Data.github.io/footprint-logger
 
-## ⚡ Getting Started
+## Author
 
-### Frontend only (no setup needed)
-```bash
-git clone https://github.com/YOUR_USERNAME/footprint-logger.git
-cd footprint-logger
-# Open index.html in your browser
-```
+Olerato-Data
 
-### Full stack (with backend)
-```bash
-# Install dependencies
-npm install
+## Course
 
-# Set environment variables
-cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secret
-
-# Start the server
-npm start
-```
-
----
-
-## 🌍 CO₂ Emission Factors
-
-| Activity | Factor | Source |
-|----------|--------|--------|
-| Petrol car | 0.21 kg CO₂/km | IPCC 2023 |
-| Electric vehicle | 0.07 kg CO₂/km | Our World in Data |
-| Short-haul flight | 255 kg CO₂/trip | IPCC 2023 |
-| Beef | 27 kg CO₂/kg | Poore & Nemecek, 2018 |
-| Electricity (SA grid) | 0.49 kg CO₂/kWh | Eskom 2023 |
-
----
-
-## 🗺️ Roadmap
-
-- [x] Activity logging with category filtering
-- [x] Visual dashboard with Chart.js
-- [x] Community comparison
-- [x] Personalised tips & weekly goals
-- [ ] User registration & login (Node.js + Express)
-- [ ] MongoDB cloud database integration
-- [ ] Weekly email summaries
-- [ ] Mobile-responsive PWA
-
----
-
-## 👤 Author
-
-**[Your Name]**  
-Data Analytics Capstone — 2025  
-GitHub: [@YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+Umuzi Developer Associate Capstone Project
