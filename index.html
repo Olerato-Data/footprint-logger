@@ -1,750 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Footprint Logger</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg:        #f0f7ff;
-    --bg1:       #ffffff;
-    --bg2:       #e4f1fd;
-    --bg3:       #cce4f9;
-    --blue:      #2196f3;
-    --blue-mid:  #42a5f5;
-    --blue-light:#bbdefb;
-    --blue-dim:  rgba(33,150,243,0.10);
-    --blue-dark: #0d47a1;
-    --yellow:    #fdd835;
-    --yellow-mid:#ffe082;
-    --yellow-dim:rgba(253,216,53,0.25);
-    --yellow-dark:#f57f17;
-    --text:      #0d2137;
-    --muted:     #4a7499;
-    --faint:     #93bcd8;
-    --border:    rgba(33,150,243,0.15);
-    --border2:   rgba(33,150,243,0.28);
-    --red:       #e53935;
-    --red-dim:   rgba(229,57,53,0.10);
-    --green:     #00897b;
-    --green-dim: rgba(0,137,123,0.10);
-    --radius:    10px;
-    --radius-lg: 16px;
-  }
-
-  html, body { height: 100%; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  /* ── LAYOUT ── */
-  .shell {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 20px 60px;
-  }
-
-  /* ── HEADER ── */
-  header {
-    padding: 28px 0 0;
-    margin-bottom: 28px;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 22px;
-  }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: var(--green-dim);
-    border: 1px solid rgba(52,201,122,0.3);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--green);
-    font-size: 16px;
-  }
-  .logo-text { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
-  .logo-sub  { font-size: 12px; color: var(--muted); font-weight: 400; }
-
-  /* ── NAV ── */
-  nav {
-    display: flex;
-    gap: 4px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 5px;
-  }
-  .nav-btn {
-    flex: 1;
-    padding: 9px 12px;
-    border: none;
-    border-radius: 9px;
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 7px;
-    transition: all 0.18s;
-  }
-  .nav-btn i { font-size: 14px; }
-  .nav-btn:hover { color: var(--text); background: var(--bg3); }
-  .nav-btn.active {
-    background: var(--green);
-    color: #060f1e;
-    font-weight: 600;
-  }
-
-  /* ── PAGES ── */
-  .page { display: none; }
-  .page.active { display: block; animation: fadeUp 0.22s ease; }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── SECTION LABEL ── */
-  .label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--faint);
-    margin-bottom: 10px;
-  }
-
-  /* ── CARD ── */
-  .card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    margin-bottom: 14px;
-  }
-  .card-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 7px;
-  }
-  .card-title i { color: var(--green); }
-
-  /* ── METRICS ── */
-  .metrics {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  @media(min-width:540px){ .metrics { grid-template-columns: repeat(4,1fr); } }
-  .metric {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 14px 16px;
-  }
-  .metric-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .metric-val   { font-size: 24px; font-weight: 600; color: var(--text); line-height: 1.1; }
-  .metric-unit  { font-size: 11px; color: var(--muted); }
-  .metric-note  { font-size: 11px; margin-top: 4px; }
-  .note-good { color: var(--green); }
-  .note-bad  { color: var(--red); }
-
-  /* ── FORM ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  @media(min-width:540px){ .form-grid { grid-template-columns: 1fr 1fr auto; } }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 12px; color: var(--muted); font-weight: 500; }
-  select, input[type=number] {
-    height: 40px;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    padding: 0 12px;
-    width: 100%;
-    outline: none;
-    transition: border-color 0.15s;
-    appearance: none;
-  }
-  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a90b0' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-  select:focus, input[type=number]:focus { border-color: var(--green); }
-  select option { background: var(--bg2); }
-
-  /* ── BUTTONS ── */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-    height: 40px; padding: 0 18px;
-    border-radius: var(--radius);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 600;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn-primary {
-    background: var(--green);
-    color: #060f1e;
-    border-color: var(--green);
-  }
-  .btn-primary:hover { background: #2db36c; border-color: #2db36c; transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--muted);
-    border-color: var(--border2);
-  }
-  .btn-ghost:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
-
-  .btn-danger {
-    background: transparent;
-    color: var(--red);
-    border-color: transparent;
-    height: 30px; width: 30px; padding: 0;
-    border-radius: 8px;
-  }
-  .btn-danger:hover { background: var(--red-dim); }
-
-  /* ── FILTER CHIPS ── */
-  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-  .chip {
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border2);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px; font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .chip:hover { border-color: var(--green); color: var(--text); }
-  .chip.active { background: var(--green-dim); border-color: rgba(52,201,122,0.4); color: var(--green); }
-
-  /* ── LOG ITEMS ── */
-  .log-list { display: flex; flex-direction: column; gap: 7px; }
-  .log-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    transition: border-color 0.15s;
-    animation: slideIn 0.18s ease;
-  }
-  @keyframes slideIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
-  .log-item:hover { border-color: var(--border2); }
-  .log-icon {
-    width: 36px; height: 36px;
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 17px; flex-shrink: 0;
-  }
-  .cat-transport { background: var(--amber-dim); }
-  .cat-food      { background: var(--green-dim); }
-  .cat-energy    { background: var(--blue-dim); }
-  .cat-other     { background: rgba(255,255,255,0.05); }
-  .log-info { flex: 1; min-width: 0; }
-  .log-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .log-meta { font-size: 11px; color: var(--muted); }
-  .log-co2  { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; flex-shrink: 0; }
-  .co2-high { color: var(--red); }
-  .co2-med  { color: var(--amber); }
-  .co2-low  { color: var(--green); }
-
-  /* ── EMPTY STATE ── */
-  .empty {
-    text-align: center; padding: 40px 20px;
-    color: var(--faint); font-size: 13px;
-  }
-  .empty i { font-size: 36px; display: block; margin-bottom: 10px; color: var(--bg3); }
-
-  /* ── CHART ── */
-  .chart-wrap { position: relative; width: 100%; height: 200px; }
-
-  /* ── COMMUNITY BARS ── */
-  .community-item { margin-bottom: 14px; }
-  .community-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
-  .bar-track { height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; position: relative; }
-  .bar-fill  { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-  .bar-you   { background: var(--green); }
-  .bar-avg   { background: var(--faint); }
-
-  /* ── PROGRESS BARS ── */
-  .goal-item { margin-bottom: 12px; }
-  .goal-meta { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
-  .goal-name { color: var(--text); }
-  .goal-pct  { color: var(--muted); font-family: 'DM Mono', monospace; }
-  .progress-track { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
-  .pf-green { background: var(--green); }
-  .pf-amber { background: var(--amber); }
-  .pf-red   { background: var(--red); }
-
-  /* ── TIP CARDS ── */
-  .tip-item {
-    display: flex; gap: 10px;
-    padding: 12px 14px;
-    background: var(--green-dim);
-    border: 1px solid rgba(52,201,122,0.15);
-    border-radius: var(--radius);
-    margin-bottom: 8px;
-  }
-  .tip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-top: 7px; flex-shrink: 0; }
-  .tip-text { font-size: 13px; color: #a8efc8; line-height: 1.55; }
-
-  /* ── STREAK ── */
-  .streak-row { display: flex; gap: 6px; flex-wrap: wrap; }
-  .streak-day {
-    width: 36px; height: 36px;
-    border-radius: 9px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 600;
-    gap: 1px;
-  }
-  .streak-day.on  { background: var(--green-dim); border: 1px solid rgba(52,201,122,0.3); color: var(--green); }
-  .streak-day.off { background: var(--bg3); border: 1px solid var(--border); color: var(--faint); }
-  .streak-day span { font-size: 8px; font-weight: 400; }
-
-  /* ── INSIGHT CARDS ── */
-  .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  @media(max-width:480px){ .insight-grid { grid-template-columns: 1fr; } }
-  .insight-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-  }
-  .insight-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .insight-icon { font-size: 18px; }
-  .insight-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-  .insight-body { font-size: 13px; color: var(--text); line-height: 1.55; }
-  .highlight { color: var(--green); font-weight: 600; }
-
-  /* ── DIVIDER ── */
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Logger</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8f5e9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Auth Forms */
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 50px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .auth-container h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+        .auth-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 12px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .switch-auth {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            cursor: pointer;
+        }
+        .switch-auth span {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        /* Main App (hidden until logged in) */
+        .main-app {
+            display: none;
+        }
+        .header {
+            background: #2e7d32;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logout-btn {
+            background: #ff5722;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        .total-emissions {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff5722;
+        }
+        .log-form {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .log-form select, .log-form input, .log-form button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .log-form button {
+            background: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+        .logs-list {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        canvas {
+            max-height: 300px;
+        }
+        .tip {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border-left: 4px solid #ff9800;
+        }
+        .streak {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff9800;
+        }
+    </style>
 </head>
 <body>
-<div class="shell">
-
-  <!-- HEADER -->
-  <header>
-    <div class="logo">
-      <div class="logo-icon"><i class="fa-solid fa-leaf"></i></div>
-      <div>
-        <div class="logo-text">Footprint Logger</div>
-        <div class="logo-sub">Track · Analyse · Reduce</div>
-      </div>
-    </div>
-    <nav>
-      <button class="nav-btn active" onclick="showPage('log', this)">
-        <i class="fa-solid fa-pen-to-square"></i> Log Activity
-      </button>
-      <button class="nav-btn" onclick="showPage('dashboard', this)">
-        <i class="fa-solid fa-chart-line"></i> Dashboard
-      </button>
-      <button class="nav-btn" onclick="showPage('insights', this)">
-        <i class="fa-solid fa-lightbulb"></i> Insights
-      </button>
-    </nav>
-  </header>
-
-  <!-- ══════════ LOG PAGE ══════════ -->
-  <div class="page active" id="page-log">
-
-    <div class="card">
-      <div class="card-title"><i class="fa-solid fa-plus-circle"></i> Add Activity</div>
-      <div class="form-grid">
-        <div class="field" style="grid-column: 1 / -1;">
-          <label>Activity</label>
-          <select id="activitySelect" onchange="updateQtyLabel()">
-            <optgroup label="🚗 Transport">
-              <option value="car_km"       data-co2="0.21"  data-cat="transport" data-icon="🚗" data-unit="km">Car (petrol) — per km</option>
-              <option value="car_ev"       data-co2="0.07"  data-cat="transport" data-icon="⚡" data-unit="km">Car (EV) — per km</option>
-              <option value="flight_short" data-co2="255"   data-cat="transport" data-icon="✈️" data-unit="trip">Short-haul flight</option>
-              <option value="flight_long"  data-co2="1100"  data-cat="transport" data-icon="🌍" data-unit="trip">Long-haul flight</option>
-              <option value="bus_km"       data-co2="0.089" data-cat="transport" data-icon="🚌" data-unit="km">Bus — per km</option>
-              <option value="train_km"     data-co2="0.041" data-cat="transport" data-icon="🚂" data-unit="km">Train — per km</option>
-            </optgroup>
-            <optgroup label="🥗 Food">
-              <option value="beef"      data-co2="27"  data-cat="food" data-icon="🥩" data-unit="kg">Beef — per kg</option>
-              <option value="chicken"   data-co2="6.9" data-cat="food" data-icon="🍗" data-unit="kg">Chicken — per kg</option>
-              <option value="veggies"   data-co2="2.0" data-cat="food" data-icon="🥦" data-unit="kg">Vegetables — per kg</option>
-              <option value="dairy"     data-co2="3.2" data-cat="food" data-icon="🧀" data-unit="kg">Dairy — per kg</option>
-              <option value="meal_meat" data-co2="3.5" data-cat="food" data-icon="🍽️" data-unit="meal">Meat-based meal</option>
-              <option value="meal_veg"  data-co2="0.8" data-cat="food" data-icon="🥗" data-unit="meal">Vegetarian meal</option>
-            </optgroup>
-            <optgroup label="⚡ Energy">
-              <option value="electricity"  data-co2="0.49"  data-cat="energy" data-icon="💡" data-unit="kWh">Electricity — per kWh</option>
-              <option value="gas"          data-co2="0.203" data-cat="energy" data-icon="🔥" data-unit="kWh">Natural gas — per kWh</option>
-              <option value="heating_oil"  data-co2="2.52"  data-cat="energy" data-icon="🛢️" data-unit="litre">Heating oil — per litre</option>
-              <option value="streaming"    data-co2="0.036" data-cat="energy" data-icon="📺" data-unit="hour">Video streaming — per hour</option>
-            </optgroup>
-          </select>
+    <div class="container">
+        <!-- Login/Register Container -->
+        <div id="authContainer" class="auth-container">
+            <h2 id="authTitle">Login</h2>
+            <input type="text" id="username" placeholder="Username" style="display: none;">
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button id="authButton">Login</button>
+            <div class="switch-auth" onclick="toggleAuth()">
+                Don't have an account? <span>Register</span>
+            </div>
         </div>
-        <div class="field">
-          <label id="qtyLabel">Quantity (km)</label>
-          <input type="number" id="qtyInput" value="10" min="0.1" step="0.1" />
+
+        <!-- Main App (hidden until login) -->
+        <div id="mainApp" class="main-app">
+            <div class="header">
+                <h1>🌍 Carbon Footprint Logger</h1>
+                <div>
+                    <span id="welcomeUser"></span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Today's Total</h3>
+                    <div class="total-emissions" id="totalEmissions">0</div>
+                    <div>kg CO₂</div>
+                </div>
+                <div class="card">
+                    <h3>Weekly Average</h3>
+                    <div id="weeklyAvg">0</div>
+                    <div>kg CO₂/day</div>
+                </div>
+                <div class="card">
+                    <h3>Logging Streak</h3>
+                    <div class="streak" id="streak">0</div>
+                    <div>days</div>
+                </div>
+                <div class="card">
+                    <h3>Community Average</h3>
+                    <div id="communityAvg">Loading...</div>
+                    <div>kg CO₂ total</div>
+                </div>
+            </div>
+
+            <div class="log-form">
+                <h3>➕ Log Activity</h3>
+                <select id="category">
+                    <option value="Transport">🚗 Transport</option>
+                    <option value="Food">🍔 Food</option>
+                    <option value="Energy">💡 Energy</option>
+                </select>
+                <select id="activity">
+                    <option value="Car (10km)">Car (10km) - 2.1 kg CO₂</option>
+                    <option value="Bus (10km)">Bus (10km) - 1.0 kg CO₂</option>
+                    <option value="Flight (1hr)">Flight (1hr) - 255 kg CO₂</option>
+                    <option value="Beef meal">Beef meal - 5.0 kg CO₂</option>
+                    <option value="Vegetarian meal">Vegetarian meal - 1.5 kg CO₂</option>
+                    <option value="Electricity (10kWh)">Electricity (10kWh) - 4.9 kg CO₂</option>
+                </select>
+                <button onclick="addLog()">Log Activity</button>
+            </div>
+
+            <div class="dashboard">
+                <div class="card">
+                    <h3>📊 Emissions by Category</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="card">
+                    <h3>📈 Weekly Trend</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>💡 Personalized Tips</h3>
+                <div id="tips" class="tip">Log more activities to get personalized tips!</div>
+            </div>
+
+            <div class="logs-list">
+                <h3>📝 Recent Logs</h3>
+                <div id="logsContainer"></div>
+            </div>
         </div>
-        <div class="field" style="justify-content: flex-end;">
-          <label>&nbsp;</label>
-          <button class="btn btn-primary" onclick="addActivity()" style="width:100%;">
-            <i class="fa-solid fa-plus"></i> Add
-          </button>
-        </div>
-      </div>
     </div>
 
-    <div class="chips">
-      <button class="chip active" onclick="setFilter('all',this)">All</button>
-      <button class="chip" onclick="setFilter('transport',this)">🚗 Transport</button>
-      <button class="chip" onclick="setFilter('food',this)">🥗 Food</button>
-      <button class="chip" onclick="setFilter('energy',this)">⚡ Energy</button>
-    </div>
+    <script>
+        // Backend API URL (will update after deployment)
+        let API_URL = 'http://localhost:3000/api';
+        let currentUserId = null;
+        let currentToken = null;
+        let categoryChart = null;
+        let trendChart = null;
+        let allLogs = [];
 
-    <div class="label">Today's log</div>
-    <div class="log-list" id="logList"></div>
-  </div>
-
-  <!-- ══════════ DASHBOARD PAGE ══════════ -->
-  <div class="page" id="page-dashboard">
-    <div class="metrics" id="metricsGrid"></div>
-
-    <div class="card">
-      <div class="card-title"><i class="fa-solid fa-chart-bar"></i> Emissions by Category</div>
-      <div class="chart-wrap"><canvas id="catChart"></canvas></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><i class="fa-solid fa-chart-line"></i> 7-Day Trend</div>
-      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><i class="fa-solid fa-users"></i> Community Comparison</div>
-      <div id="communitySection"></div>
-    </div>
-  </div>
-
-  <!-- ══════════ INSIGHTS PAGE ══════════ -->
-  <div class="page" id="page-insights">
-    <div class="insight-grid" id="insightGrid"></div>
-
-    <div class="card">
-      <div class="card-title"><i class="fa-solid fa-bullseye"></i> Weekly Reduction Goals</div>
-      <div id="goalSection"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Personalised Tips</div>
-      <div id="tipList"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><i class="fa-solid fa-fire"></i> 7-Day Logging Streak</div>
-      <div class="streak-row" id="streakRow"></div>
-    </div>
-  </div>
-
-</div><!-- /shell -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
-  // ── STATE ──
-  let state = JSON.parse(localStorage.getItem('fp_v3') || 'null') || {
-    logs: [],
-    weeklyHistory: [2.1, 3.4, 1.8, 4.2, 2.9, 3.1, 0]
-  };
-  let activeFilter = 'all';
-  let catInst = null, trendInst = null;
-
-  const COMMUNITY = { transport: 12.4, food: 8.2, energy: 5.6 };
-  const TIPS = {
-    transport: [
-      'Switch one car trip per week to public transport — it cuts per-person emissions by up to 70%.',
-      'Combine errands into a single trip to reduce total distance and fuel use.',
-      'Consider carpooling on your regular commute to halve your transport footprint.'
-    ],
-    food: [
-      'Replacing one beef meal per week with legumes or chicken makes a significant difference.',
-      'Buy local and seasonal produce to reduce supply-chain transport emissions.',
-      'Plan your meals to minimise food waste — discarded food still carries a carbon cost.'
-    ],
-    energy: [
-      'Switch to an energy provider that uses renewable sources.',
-      'Setting your thermostat 1°C lower in winter reduces heating energy use by about 10%.',
-      'Unplug devices on standby — they can account for up to 10% of home electricity use.'
-    ]
-  };
-
-  function save() { localStorage.setItem('fp_v3', JSON.stringify(state)); }
-
-  // ── NAVIGATION ──
-  function showPage(id, btn) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    btn.classList.add('active');
-    if (id === 'dashboard') renderDashboard();
-    if (id === 'insights')  renderInsights();
-  }
-
-  // ── FORM ──
-  function updateQtyLabel() {
-    const sel = document.getElementById('activitySelect');
-    const opt = sel.options[sel.selectedIndex];
-    document.getElementById('qtyLabel').textContent = 'Quantity (' + opt.dataset.unit + ')';
-  }
-
-  function addActivity() {
-    const sel = document.getElementById('activitySelect');
-    const opt = sel.options[sel.selectedIndex];
-    const qty = parseFloat(document.getElementById('qtyInput').value) || 1;
-    const co2 = parseFloat(opt.dataset.co2) * qty;
-    state.logs.unshift({
-      id: Date.now(),
-      name: opt.text.split(' — ')[0],
-      cat: opt.dataset.cat,
-      icon: opt.dataset.icon,
-      unit: opt.dataset.unit,
-      qty, co2,
-      time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
-    });
-    state.weeklyHistory[6] = state.logs.reduce((s,l) => s + l.co2, 0) / 1000;
-    save();
-    renderLogList();
-  }
-
-  function deleteLog(id) {
-    state.logs = state.logs.filter(l => l.id !== id);
-    state.weeklyHistory[6] = state.logs.reduce((s,l) => s + l.co2, 0) / 1000;
-    save();
-    renderLogList();
-  }
-
-  function setFilter(cat, btn) {
-    activeFilter = cat;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    renderLogList();
-  }
-
-  function formatCo2(g) {
-    return g >= 1000 ? (g/1000).toFixed(2) + ' kg' : Math.round(g) + ' g';
-  }
-  function co2Class(g) {
-    return g > 500 ? 'co2-high' : g > 100 ? 'co2-med' : 'co2-low';
-  }
-
-  function renderLogList() {
-    const el = document.getElementById('logList');
-    const list = activeFilter === 'all' ? state.logs : state.logs.filter(l => l.cat === activeFilter);
-    if (!list.length) {
-      el.innerHTML = '<div class="empty"><i class="fa-solid fa-leaf"></i>No activities logged yet.<br>Add one above to get started.</div>';
-      return;
-    }
-    el.innerHTML = list.map(l => `
-      <div class="log-item">
-        <div class="log-icon cat-${l.cat}">${l.icon}</div>
-        <div class="log-info">
-          <div class="log-name">${l.name}</div>
-          <div class="log-meta">${l.qty} ${l.unit} &middot; ${l.time}</div>
-        </div>
-        <div class="log-co2 ${co2Class(l.co2)}">${formatCo2(l.co2)}</div>
-        <button class="btn btn-danger" onclick="deleteLog(${l.id})" title="Remove">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-    `).join('');
-  }
-
-  // ── DASHBOARD ──
-  function catTotals() {
-    const t = { transport: 0, food: 0, energy: 0 };
-    state.logs.forEach(l => { t[l.cat] = (t[l.cat] || 0) + l.co2; });
-    return t;
-  }
-
-  function renderDashboard() {
-    const t = catTotals();
-    const totalKg = (t.transport + t.food + t.energy) / 1000;
-    const weekAvg = (state.weeklyHistory.reduce((a,b) => a+b, 0) / 7).toFixed(1);
-    const topCat = Object.entries(t).sort((a,b) => b[1]-a[1])[0]?.[0] || '—';
-
-    document.getElementById('metricsGrid').innerHTML = `
-      <div class="metric">
-        <div class="metric-label">Today</div>
-        <div class="metric-val">${totalKg.toFixed(2)}<span class="metric-unit"> kg</span></div>
-        <div class="metric-note ${totalKg > 10 ? 'note-bad' : 'note-good'}">${totalKg > 10 ? '↑ Above avg' : '↓ Below avg'}</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Weekly avg</div>
-        <div class="metric-val">${weekAvg}<span class="metric-unit"> kg/day</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Logged</div>
-        <div class="metric-val">${state.logs.length}<span class="metric-unit"> acts</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Top source</div>
-        <div class="metric-val" style="font-size:16px;text-transform:capitalize;">${topCat}</div>
-      </div>
-    `;
-
-    // Category bar chart
-    if (catInst) catInst.destroy();
-    catInst = new Chart(document.getElementById('catChart'), {
-      type: 'bar',
-      data: {
-        labels: ['Transport', 'Food', 'Energy'],
-        datasets: [{
-          data: [t.transport/1000, t.food/1000, t.energy/1000].map(v => parseFloat(v.toFixed(3))),
-          backgroundColor: ['rgba(245,166,35,0.7)', 'rgba(52,201,122,0.7)', 'rgba(77,157,224,0.7)'],
-          borderColor: ['#f5a623', '#34c97a', '#4d9de0'],
-          borderWidth: 1.5, borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a90b0', callback: v => v + ' kg', font: { size: 11, family: 'DM Mono' } }, border: { color: 'transparent' } },
-          x: { grid: { display: false }, ticks: { color: '#7a90b0', font: { size: 12, family: 'DM Sans' } }, border: { color: 'rgba(255,255,255,0.08)' } }
+        // Toggle between login and register
+        function toggleAuth() {
+            const title = document.getElementById('authTitle');
+            const usernameField = document.getElementById('username');
+            const btn = document.getElementById('authButton');
+            
+            if (title.innerText === 'Login') {
+                title.innerText = 'Register';
+                usernameField.style.display = 'block';
+                btn.innerText = 'Register';
+                document.querySelector('.switch-auth span').innerText = 'Login';
+                document.querySelector('.switch-auth').innerHTML = 'Already have an account? <span>Login</span>';
+            } else {
+                title.innerText = 'Login';
+                usernameField.style.display = 'none';
+                btn.innerText = 'Login';
+                document.querySelector('.switch-auth span').innerText = 'Register';
+                document.querySelector('.switch-auth').innerHTML = "Don't have an account? <span>Register</span>";
+            }
         }
-      }
-    });
 
-    // Trend line chart
-    if (trendInst) trendInst.destroy();
-    trendInst = new Chart(document.getElementById('trendChart'), {
-      type: 'line',
-      data: {
-        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-        datasets: [{
-          data: state.weeklyHistory,
-          borderColor: '#34c97a', borderWidth: 2,
-          backgroundColor: 'rgba(52,201,122,0.08)',
-          fill: true, tension: 0.4,
-          pointBackgroundColor: '#34c97a',
-          pointBorderColor: '#060f1e',
-          pointBorderWidth: 2, pointRadius: 5
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a90b0', callback: v => v + ' kg', font: { size: 11, family: 'DM Mono' } }, border: { color: 'transparent' } },
-          x: { grid: { display: false }, ticks: { color: '#7a90b0', font: { size: 12, family: 'DM Sans' } }, border: { color: 'rgba(255,255,255,0.08)' } }
+        // Handle authentication
+        document.getElementById('authButton').onclick = async () => {
+            const title = document.getElementById('authTitle').innerText;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (title === 'Login') {
+                // Login
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    currentUserId = data.userId;
+                    currentToken = data.token;
+                    localStorage.setItem('token', currentToken);
+                    localStorage.setItem('userId', currentUserId);
+                    document.getElementById('welcomeUser').innerText = `Welcome, ${data.username}`;
+                    document.getElementById('authContainer').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    loadUserData();
+                } else {
+                    alert('Login failed: ' + data.error);
+                }
+            } else {
+                // Register
+                const username = document.getElementById('username').value;
+                const res = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                if (res.ok) {
+                    alert('Registration successful! Please login.');
+                    toggleAuth();
+                } else {
+                    const data = await res.json();
+                    alert('Registration failed: ' + data.error);
+                }
+            }
+        };
+
+        // Get CO2 value for activity
+        function getCO2Value(activity) {
+            const values = {
+                'Car (10km)': 2.1,
+                'Bus (10km)': 1.0,
+                'Flight (1hr)': 255,
+                'Beef meal': 5.0,
+                'Vegetarian meal': 1.5,
+                'Electricity (10kWh)': 4.9
+            };
+            return values[activity] || 0;
         }
-      }
-    });
 
-    // Community comparison
-    const you = { transport: t.transport/1000, food: t.food/1000, energy: t.energy/1000 };
-    const maxV = Math.max(...Object.values(COMMUNITY), ...Object.values(you)) * 1.15;
-    const rows = [['transport','🚗 Transport'], ['food','🥗 Food'], ['energy','⚡ Energy']];
-    document.getElementById('communitySection').innerHTML = rows.map(([k, label]) => `
-      <div class="community-item">
-        <div class="community-label">
-          <span>${label}</span>
-          <span style="font-family:'DM Mono',monospace;">You ${you[k].toFixed(2)} kg &nbsp;·&nbsp; Avg ${COMMUNITY[k].toFixed(1)} kg</span>
-        </div>
-        <div style="margin-bottom:4px;">
-          <div class="bar-track"><div class="bar-fill bar-you" style="width:${Math.min(100,(you[k]/maxV*100)).toFixed(1)}%"></div></div>
-        </div>
-        <div class="bar-track"><div class="bar-fill bar-avg" style="width:${Math.min(100,(COMMUNITY[k]/maxV*100)).toFixed(1)}%"></div></div>
-      </div>
-    `).join('') + `
-      <div style="display:flex;gap:16px;margin-top:10px;">
-        <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#7a90b0;"><span style="width:10px;height:10px;border-radius:2px;background:#34c97a;display:inline-block;"></span>You</span>
-        <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#7a90b0;"><span style="width:10px;height:10px;border-radius:2px;background:#3a5070;display:inline-block;"></span>Community avg</span>
-      </div>`;
-  }
+        // Add log
+        async function addLog() {
+            const category = document.getElementById('category').value;
+            const activity = document.getElementById('activity').value;
+            const amount = 1;
+            const co2Value = getCO2Value(activity);
+            
+            const res = await fetch(`${API_URL}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUserId, category, activity, amount, co2Value })
+            });
+            
+            if (res.ok) {
+                loadUserData();
+            } else {
+                alert('Failed to save log');
+            }
+        }
 
-  // ── INSIGHTS ──
-  function renderInsights() {
-    const t = catTotals();
-    const total = t.transport + t.food + t.energy;
-    const sorted = Object.entries(t).sort((a,b) => b[1]-a[1]);
-    const topCat = sorted[0]?.[0] || 'transport';
-    const totalKg = (total / 1000).toFixed(3);
+        // Load all user data
+        async function loadUserData() {
+            // Get logs
+            const logsRes = await fetch(`${API_URL}/logs/${currentUserId}`);
+            allLogs = await logsRes.json();
+            displayLogs();
+            updateDashboard();
+            updateCharts();
+            generateTips();
+            
+            // Get community average
+            const communityRes = await fetch(`${API_URL}/community/average`);
+            const communityData = await communityRes.json();
+            document.getElementById('communityAvg').innerText = communityData.average.toFixed(1);
+        }
 
-    document.getElementById('insightGrid').innerHTML = `
-      <div class="insight-card">
-        <div class="insight-head"><span class="insight-icon">🏆</span><span class="insight-title">Top Source</span></div>
-        <div class="insight-body"><span class="highlight" style="text-transform:capitalize;">${topCat}</span> is your biggest contributor today. Focus reduction efforts here for maximum impact.</div>
-      </div>
-      <div class="insight-card">
-        <div class="insight-head"><span class="insight-icon">📊</span><span class="insight-title">Breakdown</span></div>
-        <div class="insight-body">
-          ${sorted.map(([k,v]) => `<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="text-transform:capitalize;color:#7a90b0;">${k}</span><span style="font-family:'DM Mono',monospace;font-size:12px;">${total ? ((v/total)*100).toFixed(0) : 0}%</span></div>`).join('')}
-          <div class="divider"></div>
-          <div style="font-size:13px;">Total: <span class="highlight">${totalKg} kg CO₂</span></div>
-        </div>
-      </div>
-    `;
+        function displayLogs() {
+            const container = document.getElementById('logsContainer');
+            container.innerHTML = allLogs.slice(0, 10).map(log => `
+                <div class="log-item">
+                    ${log.category}: ${log.activity} - ${log.co2Value} kg CO₂ (${new Date(log.date).toLocaleDateString()})
+                </div>
+            `).join('');
+        }
 
-    const goals = [
-      { label: 'Reduce transport by 20%', pct: Math.min(100, Math.max(0, Math.round(60 - t.transport/200))) },
-      { label: 'Meat-free days: 3 of 7',  pct: 43 },
-      { label: 'Home energy under target', pct: Math.min(100, Math.max(0, Math.round(70 - t.energy/80))) }
-    ];
-    document.getElementById('goalSection').innerHTML = goals.map(g => {
-      const cls = g.pct > 65 ? 'pf-green' : g.pct > 35 ? 'pf-amber' : 'pf-red';
-      return `<div class="goal-item">
-        <div class="goal-meta"><span class="goal-name">${g.label}</span><span class="goal-pct">${g.pct}%</span></div>
-        <div class="progress-track"><div class="progress-fill ${cls}" style="width:${g.pct}%"></div></div>
-      </div>`;
-    }).join('');
+        function updateDashboard() {
+            const total = allLogs.reduce((sum, log) => sum + log.co2Value, 0);
+            document.getElementById('totalEmissions').innerText = total.toFixed(1);
+            
+            // Simple streak calculation (days with logs)
+            const uniqueDays = new Set(allLogs.map(log => new Date(log.date).toDateString()));
+            document.getElementById('streak').innerText = uniqueDays.size;
+            
+            // Weekly average (last 7 days)
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const weekLogs = allLogs.filter(log => new Date(log.date) > oneWeekAgo);
+            const weeklyTotal = weekLogs.reduce((sum, log) => sum + log.co2Value, 0);
+            document.getElementById('weeklyAvg').innerText = (weeklyTotal / 7).toFixed(1);
+        }
 
-    const tips = TIPS[topCat] || TIPS.transport;
-    document.getElementById('tipList').innerHTML = tips.map(tip =>
-      `<div class="tip-item"><div class="tip-dot"></div><div class="tip-text">${tip}</div></div>`
-    ).join('');
+        function updateCharts() {
+            // Category totals
+            const categories = ['Transport', 'Food', 'Energy'];
+            const categoryTotals = categories.map(cat => 
+                allLogs.filter(log => log.category === cat).reduce((sum, log) => sum + log.co2Value, 0)
+            );
+            
+            if (categoryChart) categoryChart.destroy();
+            categoryChart = new Chart(document.getElementById('categoryChart'), {
+                type: 'bar',
+                data: { labels: categories, datasets: [{ label: 'kg CO₂', data: categoryTotals, backgroundColor: '#4caf50' }] }
+            });
+            
+            // Daily totals for last 7 days
+            const last7Days = [...Array(7)].map((_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                return d.toDateString();
+            }).reverse();
+            
+            const dailyTotals = last7Days.map(day => 
+                allLogs.filter(log => new Date(log.date).toDateString() === day).reduce((sum, log) => sum + log.co2Value, 0)
+            );
+            
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: { labels: last7Days.map(d => d.slice(0, 10)), datasets: [{ label: 'kg CO₂', data: dailyTotals, borderColor: '#ff5722', fill: false }] }
+            });
+        }
 
-    const days = [['M',0],['T',1],['W',2],['T',3],['F',4],['S',5],['S',6]];
-    document.getElementById('streakRow').innerHTML = days.map(([d,i]) => {
-      const on = state.weeklyHistory[i] > 0;
-      return `<div class="streak-day ${on ? 'on' : 'off'}">${d}<span>${on ? '✓' : '·'}</span></div>`;
-    }).join('');
-  }
+        function generateTips() {
+            const categories = ['Transport', 'Food', 'Energy'];
+            const totals = categories.map(cat => 
+                allLogs.filter(log => log.category === cat).reduce((sum, log) => sum + log.co2Value, 0)
+            );
+            const maxIndex = totals.indexOf(Math.max(...totals));
+            
+            let tip = '';
+            if (maxIndex === 0) tip = '🚗 Your highest emissions are from Transport. Try walking, biking, or using public transit!';
+            else if (maxIndex === 1) tip = '🍔 Your highest emissions are from Food. Try more plant-based meals!';
+            else if (maxIndex === 2) tip = '💡 Your highest emissions are from Energy. Turn off lights and unplug devices!';
+            else tip = 'Keep logging activities to get personalized tips!';
+            
+            document.getElementById('tips').innerHTML = tip;
+        }
 
-  // ── INIT ──
-  renderLogList();
-  updateQtyLabel();
-</script>
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            location.reload();
+        }
+
+        // Check for saved login
+        const savedToken = localStorage.getItem('token');
+        const savedUserId = localStorage.getItem('userId');
+        if (savedToken && savedUserId) {
+            currentToken = savedToken;
+            currentUserId = savedUserId;
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadUserData();
+        }
+    </script>
 </body>
 </html>
-
