@@ -13,14 +13,13 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #e8f5e9;
+            background: # E8f5ff;
             padding: 20px;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        /* Auth Forms */
         .auth-container {
             background: white;
             border-radius: 20px;
@@ -62,7 +61,6 @@
             color: #4caf50;
             font-weight: bold;
         }
-        /* Main App (hidden until logged in) */
         .main-app {
             display: none;
         }
@@ -75,6 +73,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         .logout-btn {
             background: #ff5722;
@@ -111,16 +110,50 @@
             border-radius: 15px;
             margin-bottom: 20px;
         }
+        .log-form h3 {
+            margin-bottom: 15px;
+            color: #2e7d32;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
         .log-form select, .log-form input, .log-form button {
-            padding: 10px;
-            margin: 5px;
+            padding: 12px;
             border-radius: 8px;
             border: 1px solid #ddd;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
         }
         .log-form button {
             background: #4caf50;
             color: white;
             cursor: pointer;
+            flex: 0.5;
+            font-weight: bold;
+        }
+        .log-form button:hover {
+            background: #388e3c;
+        }
+        .amount-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .amount-input input {
+            width: 100px;
+        }
+        .co2-preview {
+            background: #f5f5f5;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #ff5722;
+            font-weight: bold;
         }
         .logs-list {
             background: white;
@@ -132,6 +165,8 @@
         .log-item {
             padding: 10px;
             border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
         }
         canvas {
             max-height: 300px;
@@ -148,11 +183,35 @@
             font-weight: bold;
             color: #ff9800;
         }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 5px 15px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: #4caf50;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            .log-form select, .log-form input, .log-form button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Login/Register Container -->
         <div id="authContainer" class="auth-container">
             <h2 id="authTitle">Login</h2>
             <input type="text" id="username" placeholder="Username" style="display: none;">
@@ -164,7 +223,6 @@
             </div>
         </div>
 
-        <!-- Main App (hidden until login) -->
         <div id="mainApp" class="main-app">
             <div class="header">
                 <h1>🌍 Carbon Footprint Logger</h1>
@@ -198,21 +256,39 @@
             </div>
 
             <div class="log-form">
-                <h3>➕ Log Activity</h3>
-                <select id="category">
-                    <option value="Transport">🚗 Transport</option>
-                    <option value="Food">🍔 Food</option>
-                    <option value="Energy">💡 Energy</option>
-                </select>
-                <select id="activity">
-                    <option value="Car (10km)">Car (10km) - 2.1 kg CO₂</option>
-                    <option value="Bus (10km)">Bus (10km) - 1.0 kg CO₂</option>
-                    <option value="Flight (1hr)">Flight (1hr) - 255 kg CO₂</option>
-                    <option value="Beef meal">Beef meal - 5.0 kg CO₂</option>
-                    <option value="Vegetarian meal">Vegetarian meal - 1.5 kg CO₂</option>
-                    <option value="Electricity (10kWh)">Electricity (10kWh) - 4.9 kg CO₂</option>
-                </select>
-                <button onclick="addLog()">Log Activity</button>
+                <h3>➕ Log Your Activity</h3>
+                <div class="form-row">
+                    <select id="category" onchange="updateActivities()">
+                        <option value="Transport">🚗 Transport</option>
+                        <option value="Food">🍔 Food</option>
+                        <option value="Energy">💡 Energy</option>
+                        <option value="Lifestyle">🛍️ Lifestyle</option>
+                    </select>
+                    
+                    <select id="activity">
+                        <!-- Will be filled by JavaScript -->
+                    </select>
+                    
+                    <div class="amount-input">
+                        <label>Amount:</label>
+                        <input type="number" id="amount" value="1" step="0.1" min="0.1">
+                        <span id="unitLabel">units</span>
+                    </div>
+                    
+                    <div class="co2-preview" id="co2Preview">
+                        Estimated: 0 kg CO₂
+                    </div>
+                    
+                    <button onclick="addLog()">🌱 Log Activity</button>
+                </div>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterLogs('all')">All</button>
+                <button class="filter-btn" onclick="filterLogs('Transport')">🚗 Transport</button>
+                <button class="filter-btn" onclick="filterLogs('Food')">🍔 Food</button>
+                <button class="filter-btn" onclick="filterLogs('Energy')">💡 Energy</button>
+                <button class="filter-btn" onclick="filterLogs('Lifestyle')">🛍️ Lifestyle</button>
             </div>
 
             <div class="dashboard">
@@ -239,16 +315,96 @@
     </div>
 
     <script>
-        // Backend API URL
-        
         let API_URL = 'https://footprint-logger-api.onrender.com/api';
         let currentUserId = null;
         let currentToken = null;
         let categoryChart = null;
         let trendChart = null;
         let allLogs = [];
+        let currentFilter = 'all';
 
-        // Toggle between login and register
+        // Comprehensive activity database with real CO2 values (per unit)
+        const activitiesDB = {
+            Transport: [
+                { name: "Car (petrol)", co2PerUnit: 0.21, unit: "km", example: "Drive 10km = 2.1 kg" },
+                { name: "Car (electric)", co2PerUnit: 0.07, unit: "km", example: "Drive 10km = 0.7 kg" },
+                { name: "Bus", co2PerUnit: 0.05, unit: "km", example: "10km bus = 0.5 kg" },
+                { name: "Train", co2PerUnit: 0.03, unit: "km", example: "10km train = 0.3 kg" },
+                { name: "Domestic Flight", co2PerUnit: 0.25, unit: "km", example: "500km flight = 125 kg" },
+                { name: "International Flight", co2PerUnit: 0.18, unit: "km", example: "2000km flight = 360 kg" },
+                { name: "Motorcycle", co2PerUnit: 0.12, unit: "km", example: "10km = 1.2 kg" },
+                { name: "Taxi/Uber", co2PerUnit: 0.18, unit: "km", example: "10km = 1.8 kg" },
+                { name: "Bicycle", co2PerUnit: 0, unit: "km", example: "Zero emissions! 🚲" },
+                { name: "Walking", co2PerUnit: 0, unit: "km", example: "Zero emissions! 🚶" }
+            ],
+            Food: [
+                { name: "Beef (per meal)", co2PerUnit: 7.2, unit: "meal", example: "1 burger = 7.2 kg" },
+                { name: "Lamb (per meal)", co2PerUnit: 5.6, unit: "meal", example: "1 serving = 5.6 kg" },
+                { name: "Cheese (100g)", co2PerUnit: 2.1, unit: "100g", example: "100g cheese = 2.1 kg" },
+                { name: "Pork (per meal)", co2PerUnit: 1.8, unit: "meal", example: "1 pork chop = 1.8 kg" },
+                { name: "Chicken (per meal)", co2PerUnit: 1.2, unit: "meal", example: "1 chicken breast = 1.2 kg" },
+                { name: "Fish (per meal)", co2PerUnit: 1.5, unit: "meal", example: "1 serving = 1.5 kg" },
+                { name: "Vegetarian Meal", co2PerUnit: 0.8, unit: "meal", example: "Plant-based = 0.8 kg" },
+                { name: "Vegan Meal", co2PerUnit: 0.4, unit: "meal", example: "Vegan = 0.4 kg" },
+                { name: "Coffee (1 cup)", co2PerUnit: 0.3, unit: "cup", example: "Daily coffee = 0.3 kg" },
+                { name: "Bottled Water (1L)", co2PerUnit: 0.2, unit: "liter", example: "1L bottle = 0.2 kg" }
+            ],
+            Energy: [
+                { name: "Electricity", co2PerUnit: 0.49, unit: "kWh", example: "10kWh = 4.9 kg (SA grid)" },
+                { name: "Natural Gas", co2PerUnit: 0.2, unit: "kWh", example: "10kWh = 2.0 kg" },
+                { name: "Heating (Oil)", co2PerUnit: 0.27, unit: "kWh", example: "10kWh = 2.7 kg" },
+                { name: "Laundry (per load)", co2PerUnit: 0.8, unit: "load", example: "Hot wash = 0.8 kg" },
+                { name: "Dishwasher (per load)", co2PerUnit: 0.6, unit: "load", example: "1 load = 0.6 kg" },
+                { name: "Shower (10 min)", co2PerUnit: 0.5, unit: "shower", example: "Hot shower = 0.5 kg" },
+                { name: "TV (1 hour)", co2PerUnit: 0.05, unit: "hour", example: "4 hours = 0.2 kg" },
+                { name: "Laptop (1 hour)", co2PerUnit: 0.02, unit: "hour", example: "8 hours work = 0.16 kg" },
+                { name: "Refrigerator (day)", co2PerUnit: 1.2, unit: "day", example: "1 day = 1.2 kg" }
+            ],
+            Lifestyle: [
+                { name: "New Smartphone", co2PerUnit: 70, unit: "phone", example: "1 phone = 70 kg" },
+                { name: "New Laptop", co2PerUnit: 300, unit: "laptop", example: "1 laptop = 300 kg" },
+                { name: "New T-shirt", co2PerUnit: 8, unit: "shirt", example: "Cotton shirt = 8 kg" },
+                { name: "Jeans (pair)", co2PerUnit: 33, unit: "jeans", example: "1 pair jeans = 33 kg" },
+                { name: "Sneakers", co2PerUnit: 14, unit: "pair", example: "1 pair = 14 kg" },
+                { name: "Plastic Bag (1)", co2PerUnit: 0.01, unit: "bag", example: "1 bag = 0.01 kg" },
+                { name: "Paper (ream)", co2PerUnit: 2.5, unit: "ream", example: "500 sheets = 2.5 kg" },
+                { name: "Hotel Night (1 night)", co2PerUnit: 15, unit: "night", example: "1 night = 15 kg" },
+                { name: "Flight (economy)", co2PerUnit: 0.18, unit: "km", example: "1000km = 180 kg" }
+            ]
+        };
+
+        function updateActivities() {
+            const category = document.getElementById('category').value;
+            const activitySelect = document.getElementById('activity');
+            const activities = activitiesDB[category];
+            
+            activitySelect.innerHTML = '';
+            activities.forEach(act => {
+                const option = document.createElement('option');
+                option.value = act.name;
+                option.textContent = `${act.name} (${act.co2PerUnit} kg CO₂ per ${act.unit}) - ${act.example}`;
+                option.dataset.co2 = act.co2PerUnit;
+                option.dataset.unit = act.unit;
+                activitySelect.appendChild(option);
+            });
+            
+            updateCO2Preview();
+        }
+
+        function updateCO2Preview() {
+            const activitySelect = document.getElementById('activity');
+            const selectedOption = activitySelect.options[activitySelect.selectedIndex];
+            const co2PerUnit = parseFloat(selectedOption.dataset.co2) || 0;
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const totalCO2 = co2PerUnit * amount;
+            document.getElementById('co2Preview').innerHTML = `🌿 Estimated: ${totalCO2.toFixed(2)} kg CO₂`;
+            document.getElementById('unitLabel').innerText = selectedOption.dataset.unit || 'units';
+        }
+
+        document.getElementById('category').addEventListener('change', updateActivities);
+        document.getElementById('activity').addEventListener('change', updateCO2Preview);
+        document.getElementById('amount').addEventListener('input', updateCO2Preview);
+
         function toggleAuth() {
             const title = document.getElementById('authTitle');
             const usernameField = document.getElementById('username');
@@ -269,14 +425,12 @@
             }
         }
 
-        // Handle authentication
         document.getElementById('authButton').onclick = async () => {
             const title = document.getElementById('authTitle').innerText;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
             if (title === 'Login') {
-                // Login
                 const res = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -296,7 +450,6 @@
                     alert('Login failed: ' + data.error);
                 }
             } else {
-                // Register
                 const username = document.getElementById('username').value;
                 const res = await fetch(`${API_URL}/register`, {
                     method: 'POST',
@@ -313,25 +466,14 @@
             }
         };
 
-        // Get CO2 value for activity
-        function getCO2Value(activity) {
-            const values = {
-                'Car (10km)': 2.1,
-                'Bus (10km)': 1.0,
-                'Flight (1hr)': 255,
-                'Beef meal': 5.0,
-                'Vegetarian meal': 1.5,
-                'Electricity (10kWh)': 4.9
-            };
-            return values[activity] || 0;
-        }
-
-        // Add log
         async function addLog() {
             const category = document.getElementById('category').value;
-            const activity = document.getElementById('activity').value;
-            const amount = 1;
-            const co2Value = getCO2Value(activity);
+            const activitySelect = document.getElementById('activity');
+            const activity = activitySelect.value;
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const selectedOption = activitySelect.options[activitySelect.selectedIndex];
+            const co2PerUnit = parseFloat(selectedOption.dataset.co2) || 0;
+            const co2Value = co2PerUnit * amount;
             
             const res = await fetch(`${API_URL}/logs`, {
                 method: 'POST',
@@ -341,14 +483,26 @@
             
             if (res.ok) {
                 loadUserData();
+                document.getElementById('amount').value = 1;
+                updateCO2Preview();
             } else {
                 alert('Failed to save log');
             }
         }
 
-        // Load all user data
+        function filterLogs(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText.includes(category) || (category === 'all' && btn.innerText === 'All')) {
+                    btn.classList.add('active');
+                }
+            });
+            displayLogs();
+            updateCharts();
+        }
+
         async function loadUserData() {
-            // Get logs
             const logsRes = await fetch(`${API_URL}/logs/${currentUserId}`);
             allLogs = await logsRes.json();
             displayLogs();
@@ -356,30 +510,36 @@
             updateCharts();
             generateTips();
             
-            // Get community average
             const communityRes = await fetch(`${API_URL}/community/average`);
             const communityData = await communityRes.json();
             document.getElementById('communityAvg').innerText = communityData.average.toFixed(1);
         }
 
         function displayLogs() {
+            let filteredLogs = allLogs;
+            if (currentFilter !== 'all') {
+                filteredLogs = allLogs.filter(log => log.category === currentFilter);
+            }
+            
             const container = document.getElementById('logsContainer');
-            container.innerHTML = allLogs.slice(0, 10).map(log => `
+            container.innerHTML = filteredLogs.slice(0, 20).map(log => `
                 <div class="log-item">
-                    ${log.category}: ${log.activity} - ${log.co2Value} kg CO₂ (${new Date(log.date).toLocaleDateString()})
+                    <span><strong>${log.category}</strong>: ${log.activity} x${log.amount}</span>
+                    <span style="color: #ff5722; font-weight: bold;">${log.co2Value.toFixed(2)} kg CO₂</span>
                 </div>
             `).join('');
+            if (filteredLogs.length === 0) {
+                container.innerHTML = '<div class="log-item">No logs yet. Add some activities above!</div>';
+            }
         }
 
         function updateDashboard() {
             const total = allLogs.reduce((sum, log) => sum + log.co2Value, 0);
             document.getElementById('totalEmissions').innerText = total.toFixed(1);
             
-            // Simple streak calculation (days with logs)
             const uniqueDays = new Set(allLogs.map(log => new Date(log.date).toDateString()));
             document.getElementById('streak').innerText = uniqueDays.size;
             
-            // Weekly average (last 7 days)
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
             const weekLogs = allLogs.filter(log => new Date(log.date) > oneWeekAgo);
@@ -388,19 +548,25 @@
         }
 
         function updateCharts() {
-            // Category totals
-            const categories = ['Transport', 'Food', 'Energy'];
+            let filteredLogs = allLogs;
+            if (currentFilter !== 'all') {
+                filteredLogs = allLogs.filter(log => log.category === currentFilter);
+            }
+            
+            const categories = ['Transport', 'Food', 'Energy', 'Lifestyle'];
             const categoryTotals = categories.map(cat => 
-                allLogs.filter(log => log.category === cat).reduce((sum, log) => sum + log.co2Value, 0)
+                filteredLogs.filter(log => log.category === cat).reduce((sum, log) => sum + log.co2Value, 0)
             );
             
             if (categoryChart) categoryChart.destroy();
             categoryChart = new Chart(document.getElementById('categoryChart'), {
                 type: 'bar',
-                data: { labels: categories, datasets: [{ label: 'kg CO₂', data: categoryTotals, backgroundColor: '#4caf50' }] }
+                data: { 
+                    labels: categories, 
+                    datasets: [{ label: 'kg CO₂', data: categoryTotals, backgroundColor: ['#ff9800', '#4caf50', '#2196f3', '#9c27b0'] }] 
+                }
             });
             
-            // Daily totals for last 7 days
             const last7Days = [...Array(7)].map((_, i) => {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
@@ -408,30 +574,38 @@
             }).reverse();
             
             const dailyTotals = last7Days.map(day => 
-                allLogs.filter(log => new Date(log.date).toDateString() === day).reduce((sum, log) => sum + log.co2Value, 0)
+                filteredLogs.filter(log => new Date(log.date).toDateString() === day).reduce((sum, log) => sum + log.co2Value, 0)
             );
             
             if (trendChart) trendChart.destroy();
             trendChart = new Chart(document.getElementById('trendChart'), {
                 type: 'line',
-                data: { labels: last7Days.map(d => d.slice(0, 10)), datasets: [{ label: 'kg CO₂', data: dailyTotals, borderColor: '#ff5722', fill: false }] }
+                data: { 
+                    labels: last7Days.map(d => d.slice(0, 10)), 
+                    datasets: [{ label: 'kg CO₂', data: dailyTotals, borderColor: '#ff5722', fill: false, tension: 0.3 }] 
+                }
             });
         }
 
         function generateTips() {
-            const categories = ['Transport', 'Food', 'Energy'];
+            const categories = ['Transport', 'Food', 'Energy', 'Lifestyle'];
             const totals = categories.map(cat => 
                 allLogs.filter(log => log.category === cat).reduce((sum, log) => sum + log.co2Value, 0)
             );
             const maxIndex = totals.indexOf(Math.max(...totals));
             
-            let tip = '';
-            if (maxIndex === 0) tip = '🚗 Your highest emissions are from Transport. Try walking, biking, or using public transit!';
-            else if (maxIndex === 1) tip = '🍔 Your highest emissions are from Food. Try more plant-based meals!';
-            else if (maxIndex === 2) tip = '💡 Your highest emissions are from Energy. Turn off lights and unplug devices!';
-            else tip = 'Keep logging activities to get personalized tips!';
+            const tips = {
+                Transport: "🚗 Try walking, biking, or public transport. Carpooling can cut emissions by 50%!",
+                Food: "🍔 Meat has a high carbon footprint. Try meatless Mondays or plant-based alternatives!",
+                Energy: "💡 Turn off lights, unplug devices, and consider energy-efficient appliances.",
+                Lifestyle: "🛍️ Buy second-hand, repair instead of replace, and avoid single-use plastics!"
+            };
             
-            document.getElementById('tips').innerHTML = tip;
+            if (Math.max(...totals) > 0) {
+                document.getElementById('tips').innerHTML = tips[categories[maxIndex]] + " 🌱";
+            } else {
+                document.getElementById('tips').innerHTML = "Start logging activities to see personalized tips on reducing your footprint!";
+            }
         }
 
         function logout() {
@@ -440,7 +614,9 @@
             location.reload();
         }
 
-        // Check for saved login
+        // Initialize
+        updateActivities();
+        
         const savedToken = localStorage.getItem('token');
         const savedUserId = localStorage.getItem('userId');
         if (savedToken && savedUserId) {
